@@ -1,0 +1,56 @@
+const { VALIDATION_ERROR, PAGE_INDEX_SHOULD_BE_GREATER_THAN_OR_EQUAL_TO_ONE, PAGE_SIZE_LIMIT, DEFAULT_PAGE_SIZE_LIMIT, VIDEOS_NOT_FOUND, EXCEPTION_IN_FETCHING_VIDEOS, DEFAULT_PAGE_INDEX, DEFAULT_PAGE_SIZE } = require("../constant/videosControllerConstant");
+const Videos = require("../models/Videos");
+const {
+  handleErrorResponse,
+  handleSuccessResponse,
+} = require("../payload/customApiResponse");
+
+//GET all videos
+module.exports.getVideos = async (req, res) => {
+  try {
+    const pageIndex = parseInt(req.query?.pageIndex) || DEFAULT_PAGE_INDEX;
+    const pageSize = parseInt(req.query?.pageSize) || DEFAULT_PAGE_SIZE;
+    const search = req.query?.search;
+
+    if (pageIndex <= 0)
+      return handleErrorResponse(
+        res,
+        400,
+        VALIDATION_ERROR + PAGE_INDEX_SHOULD_BE_GREATER_THAN_OR_EQUAL_TO_ONE
+      );
+    if (pageSize > 100)
+      return handleErrorResponse(
+        res,
+        400,
+        VALIDATION_ERROR + PAGE_SIZE_LIMIT + DEFAULT_PAGE_SIZE_LIMIT
+      );
+
+    const query = {};
+    if (search) {
+      query["$text"] = { $search: search };
+    }
+
+    const videos = await Videos.find(query)
+      .skip((pageIndex - 1) * pageSize)
+      .limit(pageSize)
+      .sort({ publishTime: -1 });
+
+    if (!videos?.length)
+      return handleErrorResponse(res, 400, VIDEOS_NOT_FOUND);
+
+    const totalCount = await Videos.countDocuments(query);
+
+    const videoResponseDto = {
+      pageIndex,
+      pageSize,
+      totalCount,
+      data: {
+        videos,
+      },
+    };
+    return handleSuccessResponse(res, 200, videoResponseDto);
+  } catch (error) {
+    console.log(error);
+    return handleErrorResponse(res, 500, EXCEPTION_IN_FETCHING_VIDEOS);
+  }
+};

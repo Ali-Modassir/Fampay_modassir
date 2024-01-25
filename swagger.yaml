@@ -1,0 +1,57 @@
+openapi: 3.0.0
+info:
+  title: Youtube videos
+  description: API for managing youtube video data
+  version: 1.0.0
+tags:
+  - name: videos
+    description: API to fetch latest YouTube videos
+paths:
+  /api/v1/videos:
+    get:
+      summary: Get all videos
+      description: Retrieve a list of the latest videos with pagination and search options
+      parameters:
+        - in: query
+          name: pageIndex
+          schema:
+            type: integer
+            default: 1
+          description: Page number (default is 1) (optional)
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 50
+          description: Number of items per page (default is 50) (optional)
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search term for videos (optional)
+      responses:
+        '200':
+          description: Successful response (OK)
+          content:
+            application/json:
+              example:
+                pageIndex: 1
+                pageSize: 50
+                totalCount: 2
+                data:
+                  videos:
+                    - _id: "65b0d80fa3764fb05bffd52a"
+                      videoId: "-kHrWx24eOs"
+                      title: "title_1"
+                      description: "description_1"
+                      channelTitle: "channelTitle"
+                      thumbnail: ""
+                      publishTime: "2024-01-24T05:36:04.000Z"
+                    - _id: "65b0d80fa3764fb05bffd51b"
+                      videoId: "8UHhFfrFDiQ"
+                      title: "title_2"
+                      description: "description_2"
+                      channelTitle: "channelTitle"
+                      thumbnail: ""
+                      publishTime: "2024-01-24T05:36:04.000Z"
+                timestamp: "2024-01-24T05:36:04.000Z"
