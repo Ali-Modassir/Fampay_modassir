@@ -31,7 +31,7 @@ app.use("/api/v1/videos", videoRoutes);
 swagger(app);
 
 //Fetching Youtube API , every 10 secs
-// setInterval(getYTVideos, 10000);
+setInterval(getYTVideos, 10000);
 
 //Setting up database and backend Server
 const PORT = process.env.PORT || 8000;
